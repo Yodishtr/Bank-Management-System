@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 // global variables
 typedef struct Transaction{
@@ -31,20 +33,26 @@ Client client;
 
 int main(){
     int choice;
+    int running_flag = 1;
     printf("Enter your name: \n");
     scanf("%s", client.name);
     printf("Enter your account number: \n");
-    scanf("%d", client.acc_no);
-    menu();
-    printf("Enter your choice of options: \n");
-    scanf("%d", &choice);
+    scanf("%d", &client.acc_no);
+
+    while (running_flag){
+        menu();
+        printf("Enter your choice of options: \n");
+        scanf("%d", &choice);
+        float deposit_amount;
+        float withdrawal_amount;
+        float transfer_amount;
+        char transfer_account[50];
 
     switch(choice){
         case 1:
             printf("You have selected Deposit Money option.\n");
             printf("Enter the amount to deposit: \n");
-            float deposit_amount;
-            scanf("f", &deposit_amount);
+            scanf("%f", &deposit_amount);
             if (deposit_amount <= 0){
                 printf("Invalid amount. Please enter a positive number.\n");
                 while (deposit_amount <= 0){
@@ -59,7 +67,7 @@ int main(){
         case 2:
             printf("You have selected to withdraw money.\n");
             printf("Please enter the amount to withdraw: \n");
-            float withdrawal_amount;
+            
             scanf("%f", &withdrawal_amount);
             if (withdrawal_amount <= 0){
                 printf("Invalid amount. Please enter a positive number.\n");
@@ -76,8 +84,7 @@ int main(){
         case 3:
             printf("You have chosen to transfer money.\n");
             printf("Please enter the amount that you wish to transfer: \n");
-            float transfer_amount;
-            char transfer_account[50];
+            
             printf("Please enter the name of the person to transfer to: \n");
             scanf("%s", transfer_account);
             scanf("%f", &transfer_amount);
@@ -107,19 +114,14 @@ int main(){
         case 6:
             printf("Exiting the program...\n");
             printf("Thank you for using the Bomboclaat Bank. Swankipakitoke!\n");
-            exit(0);
+            running_flag = 0;
             break;
         default:
-            while (choice < 1 || choice > 6){
-                printf("Invalid choice. Please enter a valid option: \n");
-                menu();
-                scanf("%d", choice);
-                if (choice >= 1 && choice <= 6){
-                    break;
-                }
-            }
+            printf("Invalid choice. Please select a valid option from the menu.\n");
             break;
     }
+}
+
 
 
     return 0;
