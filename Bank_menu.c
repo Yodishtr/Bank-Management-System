@@ -1,19 +1,30 @@
 #include <stdio.h>
 
 // global variables
+typedef struct Transaction{
+    char transfer_to[50];
+    char transfer_from[50];
+    float transfer_amount;
+} Transaction;
+
 typedef struct Client{
     char name[50];
     int acc_no;
     float balance;
+    Transaction transaction_list[100];
+    int transaction_count;
+
 } Client;
+
+
 
 // function prototypes for banking operations
 void menu();
 void deposit_money(Client *client_ptr, float amount);
 void withdraw_money(Client *client_ptr, float *amount);
-void transfer_money();
-void account_details();
-void transaction_details();
+void transfer_money(Client *client_ptr, float *amount, char *transfer_account);
+void account_details(Client *client_ptr);
+void transaction_details(Client *client_ptr);
 
 // client initalization
 Client client;
@@ -64,19 +75,49 @@ int main(){
             break;
         case 3:
             printf("You have chosen to transfer money.\n");
-            transfer_money();
+            printf("Please enter the amount that you wish to transfer: \n");
+            float transfer_amount;
+            char transfer_account[50];
+            printf("Please enter the name of the person to transfer to: \n");
+            scanf("%s", transfer_account);
+            scanf("%f", &transfer_amount);
+            if (transfer_amount <= 0){
+                printf("Invalid amount. Please enter a positive number.\n");
+                while (transfer_amount <= 0){
+                    printf("enter a valid amount\n");
+                    scanf("%f", &transfer_amount);
+                }
+            }
+            transfer_money(&client, &transfer_amount, transfer_account);
+            printf("You have successfully transferred %.2f from your account.\n", transfer_amount);
+            printf("Your new balance is: %.2f\n", client.balance);
             break;
         case 4:
-            account_details();
+            printf("You have selected to display your account balance. \n");
+            account_details(&client);
+            printf("Your account details are displayed above.\n");
+            printf("Ayo Bomboclaat Bank reeeeal glad to hav ya as a cuhstomah!\n");
             break;
         case 5:
-            transaction_details();
+            printf("You have selected to display the transaction details.\n");
+            transaction_details(&client);
+            printf("Your transaction details are displayed above.\n");
+            printf("Thank you for choosing the Bomboclaat Bank. JAH!\n");
             break;
         case 6:
             printf("Exiting the program...\n");
+            printf("Thank you for using the Bomboclaat Bank. Swankipakitoke!\n");
+            exit(0);
             break;
         default:
-            printf("Invalid choice. Please try again.\n");
+            while (choice < 1 || choice > 6){
+                printf("Invalid choice. Please enter a valid option: \n");
+                menu();
+                scanf("%d", choice);
+                if (choice >= 1 && choice <= 6){
+                    break;
+                }
+            }
             break;
     }
 
@@ -108,6 +149,51 @@ void withdraw_money(Client *client_ptr, float *amount){
         (*client_ptr).balance -= *amount;
     } else {
         (*client_ptr).balance -= *amount;
+    }
+}
+
+void transfer_money(Client *client_ptr, float *amount, char *transfer_account){
+    if ((*client_ptr).balance < *amount){
+        printf("Please enter a valid amount to transfer: \n");
+        scanf("%f", amount);
+        while ((*client_ptr).balance < *amount){
+            printf("Insufficient funds in your account. Enter a valid amount: \n");
+            scanf("%f", amount);
+        }
+        (*client_ptr).balance -= *amount;
+        Transaction current_transaction;
+        strcpy(current_transaction.transfer_to, transfer_account);
+        strcpy(current_transaction.transfer_from, (*client_ptr).name);
+        current_transaction.transfer_amount = *amount;
+        (*client_ptr).transaction_list[(*client_ptr).transaction_count] = current_transaction;
+        (*client_ptr).transaction_count++;
+    } else {
+        (*client_ptr).balance -= *amount;
+        Transaction current_transaction;
+        strcpy(current_transaction.transfer_to, transfer_account);
+        strcpy(current_transaction.transfer_from, (*client_ptr).name);
+        current_transaction.transfer_amount = *amount;
+        (*client_ptr).transaction_list[(*client_ptr).transaction_count] = current_transaction;
+        (*client_ptr).transaction_count++;
+    }
+}
+
+void account_details(Client *client_ptr){
+    printf("Account holder name: %s\n", client_ptr->name);
+    printf("Account number: %d\n", client_ptr->acc_no);
+    printf("Account balance: %.2f\n", client_ptr->balance);
+    printf("Number of transactions: %d\n", client_ptr->transaction_count);
+}
+
+void transaction_details(Client *client_ptr){
+    printf("Transaction details: \n");
+    int i;
+    for (int i = 0; i < client_ptr->transaction_count; i++){
+        printf("Transaction %d\t", i + 1);
+        printf("Transfer to: %s\t", client_ptr->transaction_list[i].transfer_to);
+        printf("Transfer from: %s\t", client_ptr->transaction_list[i].transfer_from);
+        printf("Transfer amount: %.2f\t", client_ptr->transaction_list[i].transfer_amount);
+        printf("\n");
     }
 }
 
